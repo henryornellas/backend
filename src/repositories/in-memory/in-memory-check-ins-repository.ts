@@ -31,4 +31,34 @@ export class InMemoryCheckInsRepository implements CheckInsRepository {
 
     return userCheckIn
   }
+
+  async findCheckIns(userId: string, page: number = 1) {
+    const userCheckIns = this.items.filter(({ user_id }) => user_id === userId)
+
+    const paginated = userCheckIns.slice((page - 1) * 20, page * 20)
+
+    return paginated
+  }
+
+  async countByUserId(userId: string) {
+    return this.items.filter(({ user_id }) => user_id === userId).length
+  }
+
+  async findById(checkInId: string) {
+    const foundCheckIn = this.items.find(({ id }) => id === checkInId)
+
+    if (!foundCheckIn) return null
+
+    return foundCheckIn
+  }
+
+  async save(checkIn: CheckIn) {
+    const checkInIndex = this.items.findIndex(({ id }) => id === checkIn.id)
+
+    if (checkInIndex >= 0) {
+      this.items[checkInIndex].validated_at = new Date()
+    }
+
+    return checkIn
+  }
 }
